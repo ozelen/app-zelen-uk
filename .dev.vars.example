@@ -1,0 +1,3 @@
+# Leave ACCESS_* empty locally: everyone is dev@localhost. In production set them as Worker vars.
+ACCESS_TEAM_DOMAIN=
+ACCESS_AUD=

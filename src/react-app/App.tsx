@@ -1,66 +1,43 @@
-// src/App.tsx
+import { useEffect, useState } from "react";
+import { NavLink, Route, Routes } from "react-router";
+import Home from "./pages/Home";
+import Chat from "./pages/Chat";
+import Profile from "./pages/Profile";
+import Domain from "./pages/Domain";
 
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
-import cloudflareLogo from "./assets/Cloudflare_Logo.svg";
-import honoLogo from "./assets/hono.svg";
-import "./App.css";
+export type Me = { email: string; id: string };
 
-function App() {
-	const [count, setCount] = useState(0);
-	const [name, setName] = useState("unknown");
+export default function App() {
+	const [me, setMe] = useState<Me | null | undefined>();
+	useEffect(() => {
+		fetch("/api/me").then(async (r) => setMe(r.ok ? await r.json() : null));
+	}, []);
+
+	if (me === undefined) return <main className="center">…</main>;
+	if (me === null)
+		return (
+			<main className="center">
+				<h1>app.zelen.uk</h1>
+				<p>Sign in is handled by Cloudflare Access.</p>
+				<a className="button" href="/">Sign in</a>
+			</main>
+		);
 
 	return (
 		<>
-			<div>
-				<a href="https://vite.dev" target="_blank">
-					<img src={viteLogo} className="logo" alt="Vite logo" />
-				</a>
-				<a href="https://react.dev" target="_blank">
-					<img src={reactLogo} className="logo react" alt="React logo" />
-				</a>
-				<a href="https://hono.dev/" target="_blank">
-					<img src={honoLogo} className="logo cloudflare" alt="Hono logo" />
-				</a>
-				<a href="https://workers.cloudflare.com/" target="_blank">
-					<img
-						src={cloudflareLogo}
-						className="logo cloudflare"
-						alt="Cloudflare logo"
-					/>
-				</a>
-			</div>
-			<h1>Vite + React + Hono + Cloudflare</h1>
-			<div className="card">
-				<button
-					onClick={() => setCount((count) => count + 1)}
-					aria-label="increment"
-				>
-					count is {count}
-				</button>
-				<p>
-					Edit <code>src/App.tsx</code> and save to test HMR
-				</p>
-			</div>
-			<div className="card">
-				<button
-					onClick={() => {
-						fetch("/api/")
-							.then((res) => res.json() as Promise<{ name: string }>)
-							.then((data) => setName(data.name));
-					}}
-					aria-label="get name"
-				>
-					Name from API is: {name}
-				</button>
-				<p>
-					Edit <code>worker/index.ts</code> to change the name
-				</p>
-			</div>
-			<p className="read-the-docs">Click on the logos to learn more</p>
+			<main>
+				<Routes>
+					<Route path="/" element={<Home me={me} />} />
+					<Route path="/chat" element={<Chat me={me} />} />
+					<Route path="/profile" element={<Profile me={me} />} />
+					<Route path="/:domain" element={<Domain />} />
+				</Routes>
+			</main>
+			<nav className="tabs">
+				<NavLink to="/" end>Home</NavLink>
+				<NavLink to="/chat">Chat</NavLink>
+				<NavLink to="/profile">Profile</NavLink>
+			</nav>
 		</>
 	);
 }
-
-export default App;

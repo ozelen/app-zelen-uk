@@ -4,12 +4,21 @@
 	"main": "./src/worker/index.ts",
 	"compatibility_date": "2025-10-08",
 	"compatibility_flags": ["nodejs_compat"],
-	"observability": {
-		"enabled": true
-	},
+	"observability": { "enabled": true },
 	"upload_source_maps": true,
 	"assets": {
 		"directory": "./dist/client",
-		"not_found_handling": "single-page-application"
+		"not_found_handling": "single-page-application",
+		"run_worker_first": ["/agents/*", "/api/*"]
+	},
+	"ai": { "binding": "AI", "remote": true },
+	"durable_objects": {
+		"bindings": [{ "name": "Assistant", "class_name": "Assistant" }]
+	},
+	"migrations": [{ "tag": "v1", "new_sqlite_classes": ["Assistant"] }],
+	"vars": {
+		"MODEL": "@cf/moonshotai/kimi-k2.7-code",
+		"ACCESS_TEAM_DOMAIN": "",
+		"ACCESS_AUD": ""
 	}
 }
