@@ -56,6 +56,7 @@
 	"vars": {
 		"MODEL": "@cf/moonshotai/kimi-k2.7-code",
 		"ACCESS_TEAM_DOMAIN": "zelenuk.cloudflareaccess.com",
-		"ACCESS_AUD": "23ab9500454e14f1c428610f1abdfcaf83a587807957ef242f87937345d7885c"
+		"ACCESS_AUD": "23ab9500454e14f1c428610f1abdfcaf83a587807957ef242f87937345d7885c",
+		"FIN_URL": "https://fin.zelen.uk"
 	}
 }

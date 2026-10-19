@@ -66,6 +66,17 @@ export class ModuleAgent extends Agent<Env> {
 		this.touch();
 		return id;
 	}
+	upsert(table: string, row: Row): string {
+		if (!this.tables.includes(table) || table === "activity") throw new Error(`unknown table ${table}`);
+		const cols = Object.keys(row).filter((c) => /^\w+$/.test(c));
+		this.ctx.storage.sql.exec(`INSERT OR REPLACE INTO ${table} (${cols.join(",")}) VALUES (${cols.map(() => "?").join(",")})`, ...cols.map((c) => row[c] ?? null));
+		this.touch();
+		return String(row.id);
+	}
+	rows_(table: string, limit = 20): Row[] {
+		if (!this.tables.includes(table)) throw new Error(`unknown table ${table}`);
+		return this.rows(`SELECT * FROM ${table} ORDER BY rowid DESC LIMIT ?`, limit);
+	}
 	addGoal(g: Pick<Goal, "title" | "target" | "unit" | "due">): Goal {
 		const id = crypto.randomUUID();
 		this.ctx.storage.sql.exec("INSERT INTO goals (id,title,target,unit,due,created_at) VALUES (?,?,?,?,?,?)", id, g.title, g.target ?? null, g.unit ?? null, g.due ?? null, now());

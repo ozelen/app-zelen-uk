@@ -1,3 +1,8 @@
 # Leave ACCESS_* empty locally: everyone is dev@localhost. In production set them as Worker vars.
 ACCESS_TEAM_DOMAIN=
 ACCESS_AUD=
+# fin.zelen.uk: Access service token + fin login (production: wrangler secret put …)
+FIN_ACCESS_CLIENT_ID=
+FIN_ACCESS_CLIENT_SECRET=
+FIN_USERNAME=
+FIN_PASSWORD=

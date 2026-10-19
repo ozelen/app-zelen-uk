@@ -51,6 +51,11 @@ app.post("/api/modules/:id/sessions", async (c) => {
 	return c.json(await (await modAgent(c.env, c.req.param("id"), c.get("me").id)).createSession(title));
 });
 
+app.get("/api/modules/:id/data/:table", async (c) => {
+	if (!moduleById(c.req.param("id"))) return c.notFound();
+	return c.json(await (await modAgent(c.env, c.req.param("id"), c.get("me").id)).rows_(c.req.param("table"), 30));
+});
+
 app.post("/api/modules/:id/notifications/:nid/read", async (c) => {
 	await (await modAgent(c.env, c.req.param("id"), c.get("me").id)).markRead(c.req.param("nid"));
 	return c.body(null, 204);

@@ -4,6 +4,7 @@ import { createAI } from "agents/models/ai-sdk";
 import { convertToModelMessages, stepCountIs, streamText, tool } from "ai";
 import { z } from "zod";
 import { moduleById } from "../modules";
+import { MODULE_TOOLS } from "../modules/server";
 import type { ModuleAgent } from "./module-agent";
 
 // One chat session, named `${moduleId}:${userId}:${sessionId}`. Tools act on the user's ModuleAgent.
@@ -21,10 +22,11 @@ export class ModuleChat extends AIChatAgent<Env> {
 Today is ${new Date().toISOString().slice(0, 10)}. Be direct and concise.
 You keep structured data in SQLite tables: ${tables.join(", ")}. Module tables:
 ${def.schema.join("\n")}
-Use the tools to read and write; never invent data. After logging anything, confirm in one line.`,
+Use the tools to read and write; never invent data. Backend tools (fin_*) are the source of truth; the module tables are your working copy. After logging anything, confirm in one line.`,
 			messages: await convertToModelMessages(this.messages),
 			stopWhen: stepCountIs(6),
 			tools: {
+				...(MODULE_TOOLS[moduleId]?.({ env: this.env, userId, mod }) ?? {}),
 				query: tool({ description: "Run a read-only SELECT over the module tables", inputSchema: z.object({ sql: z.string() }), execute: ({ sql }) => mod.query(sql) }),
 				insert: tool({ description: "Insert one row into a module table", inputSchema: z.object({ table: z.string(), row: z.record(z.string(), z.union([z.string(), z.number(), z.null()])) }), execute: ({ table, row }) => mod.insert(table, row) }),
 				add_goal: tool({ description: "Create a goal", inputSchema: z.object({ title: z.string(), target: z.number().nullable(), unit: z.string().nullable(), due: z.string().nullable() }), execute: (g) => mod.addGoal(g) }),
