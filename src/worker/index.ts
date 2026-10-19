@@ -52,7 +52,8 @@ app.post("/api/modules/:id/sessions", async (c) => {
 });
 
 app.get("/api/modules/:id/data/:table", async (c) => {
-	if (!moduleById(c.req.param("id"))) return c.notFound();
+	const def = moduleById(c.req.param("id"));
+	if (!def?.schema.some((s) => s.includes(`EXISTS ${c.req.param("table")} `))) return c.notFound();
 	return c.json(await (await modAgent(c.env, c.req.param("id"), c.get("me").id)).rows_(c.req.param("table"), 30));
 });
 
