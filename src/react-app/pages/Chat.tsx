@@ -1,24 +1,26 @@
 import { useState } from "react";
+import { Link } from "react-router";
 import { useAgent } from "agents/react";
 import { useAgentChat } from "@cloudflare/ai-chat/react";
-import type { Me } from "../App";
 
-export default function Chat({ me }: { me: Me }) {
-	const agent = useAgent({ agent: "assistant", name: me.id });
-	const { messages, sendMessage, status, clearHistory } = useAgentChat({ agent });
+export default function Chat({ agent, name, title, back }: { agent: string; name: string; title: string; back?: string }) {
+	const a = useAgent({ agent, name });
+	const { messages, sendMessage, status, clearHistory } = useAgentChat({ agent: a });
 	const [text, setText] = useState("");
 
 	return (
 		<div className="chat">
 			<header className="row">
-				<h1>Assistant</h1>
+				<h1>{back ? <Link to={back} className="plain">‹ {title}</Link> : title}</h1>
 				<button className="link" onClick={clearHistory}>Clear</button>
 			</header>
 			<div className="messages">
-				{messages.length === 0 && <p className="muted">Ask about money, meals, a job round, or what to do today.</p>}
+				{messages.length === 0 && <p className="muted">Ask, log, or plan. Tools run on your own data.</p>}
 				{messages.map((m) => (
 					<div key={m.id} className={`msg ${m.role}`}>
-						{m.parts.map((p, i) => (p.type === "text" ? <span key={i}>{p.text}</span> : null))}
+						{m.parts.map((p, i) =>
+							p.type === "text" ? <span key={i}>{p.text}</span> : p.type.startsWith("tool-") ? <em key={i} className="muted tool">{p.type.slice(5)}</em> : null,
+						)}
 					</div>
 				))}
 			</div>

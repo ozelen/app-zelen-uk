@@ -27,6 +27,14 @@
 			{
 				"name": "Assistant",
 				"class_name": "Assistant"
+			},
+			{
+				"name": "ModuleAgent",
+				"class_name": "ModuleAgent"
+			},
+			{
+				"name": "ModuleChat",
+				"class_name": "ModuleChat"
 			}
 		]
 	},
@@ -35,6 +43,13 @@
 			"tag": "v1",
 			"new_sqlite_classes": [
 				"Assistant"
+			]
+		},
+		{
+			"tag": "v2",
+			"new_sqlite_classes": [
+				"ModuleAgent",
+				"ModuleChat"
 			]
 		}
 	],

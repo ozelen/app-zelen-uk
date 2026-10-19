@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useAgent } from "agents/react";
 import type { Me } from "../App";
-import type { AssistantState, Profile as P } from "../../worker/assistant";
+import type { AssistantState, Profile as P } from "../../modules/contract";
 
 const empty: P = { name: "", timezone: Intl.DateTimeFormat().resolvedOptions().timeZone, about: "" };
 

@@ -2,8 +2,7 @@ import { AIChatAgent } from "@cloudflare/ai-chat";
 import { createAI } from "agents/models/ai-sdk";
 import { convertToModelMessages, streamText } from "ai";
 
-export type Profile = { name: string; timezone: string; about: string };
-export type AssistantState = { profile: Profile };
+import type { AssistantState } from "../modules/contract";
 
 // One Assistant per person (instance name = user id). Chat history, profile and
 // later habit tables all live in this Durable Object's SQLite.

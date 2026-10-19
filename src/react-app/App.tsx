@@ -3,7 +3,7 @@ import { NavLink, Route, Routes } from "react-router";
 import Home from "./pages/Home";
 import Chat from "./pages/Chat";
 import Profile from "./pages/Profile";
-import Domain from "./pages/Domain";
+import ModulePage from "./pages/ModulePage";
 
 export type Me = { email: string; id: string };
 
@@ -27,10 +27,11 @@ export default function App() {
 		<>
 			<main>
 				<Routes>
-					<Route path="/" element={<Home me={me} />} />
-					<Route path="/chat" element={<Chat me={me} />} />
+					<Route path="/" element={<Home />} />
+					<Route path="/chat" element={<Chat agent="assistant" name={me.id} title="Assistant" />} />
 					<Route path="/profile" element={<Profile me={me} />} />
-					<Route path="/:domain" element={<Domain />} />
+					<Route path="/:module" element={<ModulePage />} />
+					<Route path="/:module/chat/:session" element={<ModuleChatRoute me={me} />} />
 				</Routes>
 			</main>
 			<nav className="tabs">
@@ -40,4 +41,13 @@ export default function App() {
 			</nav>
 		</>
 	);
+}
+
+import { useParams } from "react-router";
+import { MODULES } from "../modules";
+function ModuleChatRoute({ me }: { me: Me }) {
+	const { module, session } = useParams();
+	const def = MODULES.find((m) => m.id === module);
+	if (!def || !session) return <p>Not found.</p>;
+	return <Chat agent="module-chat" name={`${def.id}:${me.id}:${session}`} title={def.title} back={`/${def.id}`} />;
 }

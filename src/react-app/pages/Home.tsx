@@ -1,34 +1,49 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router";
-import type { Me } from "../App";
+import { MODULES } from "../../modules";
+import type { Home as HomeData } from "../../modules/contract";
 
-export const DOMAINS = [
-	{ slug: "finance", title: "Finance", hint: "Budgets, invoices, tax", live: "https://fin.zelen.uk" },
-	{ slug: "fitness", title: "Fitness", hint: "Habits, meals, streak", live: "https://fit.zelen.uk" },
-	{ slug: "career", title: "Career", hint: "Opportunities, rounds, lessons" },
-	{ slug: "education", title: "Education", hint: "Courses, reading, practice" },
-];
-
-export default function Home({ me }: { me: Me }) {
+export default function Home() {
+	const [home, setHome] = useState<HomeData>();
+	useEffect(() => {
+		fetch("/api/home").then(async (r) => r.ok && setHome(await r.json()));
+	}, []);
 	const hour = new Date().getHours();
 	const greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
+	const achievements = (home?.modules ?? [])
+		.flatMap((m) => m.achievements.map((a) => ({ ...a, module: MODULES.find((d) => d.id === m.id)?.title })))
+		.sort((a, b) => b.at.localeCompare(a.at))
+		.slice(0, 5);
+	const unread = (home?.modules ?? []).reduce((n, m) => n + m.notifications.length, 0);
+
 	return (
 		<>
-			<header>
+			<header className="row">
 				<h1>{greeting}</h1>
-				<p className="muted">{me.email}</p>
+				<div className="streak" title="Daily streak">
+					<strong>{home?.streak ?? "–"}</strong>
+					<span className="muted">{home?.activeToday ? "day streak" : "days · nothing today yet"}</span>
+				</div>
 			</header>
-			<section className="card">
-				<h2>Today</h2>
-				<p className="muted">Streak and nudges appear here once the first habits exist.</p>
-				<Link className="button" to="/chat">Ask the assistant</Link>
-			</section>
 			<section className="grid">
-				{DOMAINS.map((d) => (
-					<Link key={d.slug} to={`/${d.slug}`} className="tile">
-						<strong>{d.title}</strong>
-						<span className="muted">{d.hint}</span>
-					</Link>
+				{MODULES.map((d) => {
+					const m = home?.modules.find((x) => x.id === d.id);
+					const open = m?.goals.filter((g) => !g.done_at).length ?? 0;
+					return (
+						<Link key={d.id} to={`/${d.id}`} className="tile">
+							<strong>{d.title}{m && m.notifications.length > 0 && <span className="badge">{m.notifications.length}</span>}</strong>
+							<span className="muted">{m ? `${open} open goal${open === 1 ? "" : "s"}` : d.hint}</span>
+						</Link>
+					);
+				})}
+			</section>
+			<section className="card">
+				<h2>Achievements</h2>
+				{achievements.length === 0 && <p className="muted">Reach a goal in any module and it shows up here.</p>}
+				{achievements.map((a) => (
+					<p key={a.id}><span className="muted">{a.at.slice(0, 10)} · {a.module}</span><br />{a.title}</p>
 				))}
+				{unread > 0 && <p className="muted">{unread} unread notification{unread === 1 ? "" : "s"} in the modules.</p>}
 			</section>
 		</>
 	);
