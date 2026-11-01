@@ -4,5 +4,4 @@ ACCESS_AUD=
 # fin.zelen.uk: Access service token + fin login (production: wrangler secret put …)
 FIN_ACCESS_CLIENT_ID=
 FIN_ACCESS_CLIENT_SECRET=
-FIN_USERNAME=
-FIN_PASSWORD=
+APP_JWT_PRIVATE_JWK=

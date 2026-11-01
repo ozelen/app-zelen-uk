@@ -5,7 +5,7 @@ export type Identity = { email: string; id: string };
 // Cloudflare Access sits in front of app.zelen.uk and sets this header / cookie.
 // With ACCESS_TEAM_DOMAIN unset (local dev) everyone is the dev user.
 export async function identify(request: Request, env: Env): Promise<Identity | null> {
-	if (!env.ACCESS_TEAM_DOMAIN) return { email: "dev@localhost", id: "dev" };
+	if (!env.ACCESS_TEAM_DOMAIN) return { email: "dev@localhost", id: "dev@localhost" };
 	const token =
 		request.headers.get("Cf-Access-Jwt-Assertion") ??
 		request.headers.get("Cookie")?.match(/CF_Authorization=([^;]+)/)?.[1];

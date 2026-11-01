@@ -30,7 +30,7 @@ export type ModuleSummary = {
 	activityDates: string[];
 };
 
-export type Home = { streak: number; activeToday: boolean; modules: ModuleSummary[] };
+export type Home = { streak: number; activeToday: boolean; modules: ModuleSummary[]; dashboards: Record<string, Record<string, unknown> | { error: string }> };
 
 export type Profile = { name: string; timezone: string; about: string };
 export type AssistantState = { profile: Profile };

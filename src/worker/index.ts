@@ -2,6 +2,8 @@ import { Hono } from "hono";
 import { getAgentByName, routeAgentRequest } from "agents";
 import { identify } from "./auth";
 import { MODULES, moduleById } from "../modules";
+import { MODULE_DASHBOARD, MODULE_ROUTES } from "../modules/server";
+import { jwks } from "./tokens";
 import type { ModuleAgent } from "./module-agent";
 import type { Home } from "../modules/contract";
 
@@ -11,6 +13,8 @@ export { ModuleChat } from "./module-chat";
 
 type Ctx = { Bindings: Env; Variables: { me: { email: string; id: string } } };
 const app = new Hono<Ctx>();
+
+app.get("/.well-known/jwks.json", (c) => c.json(jwks(c.env)));
 
 app.use("*", async (c, next) => {
 	const me = await identify(c.req.raw, c.env);
@@ -36,9 +40,15 @@ app.get("/api/home", async (c) => {
 		streak++;
 		d.setDate(d.getDate() - 1);
 	}
-	const home: Home = { streak, activeToday: days.has(new Date().toISOString().slice(0, 10)), modules };
+	const dashboards: Home["dashboards"] = {};
+	await Promise.all(Object.entries(MODULE_DASHBOARD).map(async ([id, fn]) => {
+		dashboards[id] = await fn!(c.env, me.email).catch((e: Error) => ({ error: e.message }));
+	}));
+	const home: Home = { streak, activeToday: days.has(new Date().toISOString().slice(0, 10)), modules, dashboards };
 	return c.json(home);
 });
+
+for (const [id, r] of Object.entries(MODULE_ROUTES)) app.route(`/api/modules/${id}`, r!);
 
 app.get("/api/modules/:id", async (c) => {
 	if (!moduleById(c.req.param("id"))) return c.notFound();

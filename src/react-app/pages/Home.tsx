@@ -3,6 +3,8 @@ import { Link } from "react-router";
 import { MODULES } from "../../modules";
 import type { Home as HomeData } from "../../modules/contract";
 
+const eur = (v: unknown) => new Intl.NumberFormat("en", { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(Number(v) || 0);
+
 export default function Home() {
 	const [home, setHome] = useState<HomeData>();
 	useEffect(() => {
@@ -37,6 +39,20 @@ export default function Home() {
 					);
 				})}
 			</section>
+			{home?.dashboards.finance && (
+				<section className="card">
+					<h2>Finance · {"month" in home.dashboards.finance ? String(home.dashboards.finance.month) : "this month"}</h2>
+					{"error" in home.dashboards.finance ? (
+						<p className="muted">fin.zelen.uk unreachable: {home.dashboards.finance.error}</p>
+					) : (
+						<p className="kpis">
+							<span><span className="muted">In</span><strong>{eur(home.dashboards.finance.income)}</strong></span>
+							<span><span className="muted">Out</span><strong>{eur(home.dashboards.finance.expense)}</strong></span>
+							<span><span className="muted">Net</span><strong>{eur(home.dashboards.finance.net)}</strong></span>
+						</p>
+					)}
+				</section>
+			)}
 			<section className="card">
 				<h2>Achievements</h2>
 				{achievements.length === 0 && <p className="muted">Reach a goal in any module and it shows up here.</p>}

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 import { MODULES } from "../../modules";
+import { MODULE_PANELS } from "../../modules/client";
 import type { ModuleSummary, Row } from "../../modules/contract";
 
 export default function ModulePage() {
@@ -32,9 +33,11 @@ export default function ModulePage() {
 		load();
 	};
 
+	const Panel = MODULE_PANELS[def.id];
 	return (
 		<>
 			<header className="row"><div><h1>{def.title}</h1><p className="muted">{def.hint}</p></div><button onClick={newChat}>New chat</button></header>
+			{Panel && <Panel />}
 			{s?.notifications.length ? (
 				<section className="card">
 					<h2>Notifications</h2>
