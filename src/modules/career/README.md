@@ -1,7 +1,7 @@
 # Career module
 
-Owned by the Career agent team. Edit only this folder.
+Owned by the Career agent team. Edit only this folder. Knowledge space: vault `clients/zelen.uk/job.zelen.uk/`.
 
-- `module.ts` — id, title, extra SQLite tables, agent persona. Shared tables (goals, metrics, achievements, notifications, sessions, activity) come from `src/worker/module-agent.ts`; do not redefine them.
-- Add module-specific tools by extending the generic ones in `src/worker/module-chat.ts` through the registry, not by editing the worker.
-- Data sources: the Obsidian vault `career/` tree (Career OS protocol) until an API exists.
+- Backend: **job.zelen.uk** (Django + DRF + Postgres on the NAS, repo `ozelen/job-zelen-uk`) is the system of record. This module's SQLite tables are the agent's working copy, like finance's `transactions`.
+- `module.ts` — tables `opportunities`, `rounds`, `contacts`, `cvs`, `notes`; persona = condensed Career Advisor Protocol (`career/strategy/Advisor Protocol.md` in the vault). Shared tables come from `src/worker/module-agent.ts`.
+- To write: `tools.ts` with `job_*` tools on the finance `fin.ts` pattern (JWT login at `/api/auth/token/`, Access service token). Vars `JOB_URL`; secrets `JOB_ACCESS_CLIENT_ID`, `JOB_ACCESS_CLIENT_SECRET`, `JOB_USERNAME`, `JOB_PASSWORD`.
